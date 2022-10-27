@@ -1,0 +1,92 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: web
+---
+apiVersion: v1
+data:
+  index.html: "<!DOCTYPE html>\r\n<html>\r\n\t<head>\r\n\t\t<!-- CSS code-->\r\n\r\n\t\t<style>\r\n\t\t\t/*apply
+    css properties to body tag*/\r\n\r\n\t\t\tbody {\r\n\t\t\t\tposition: absolute;\r\n\t\t\t\tleft:
+    0%;\r\n\t\t\t\ttext-align: center;\r\n\t\t\t}\r\n\r\n\t\t\t/*apply css properties
+    to container class*/\r\n\r\n\t\t\t.container {\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\talign-items:
+    center;\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\theight: 100%;\r\n\t\t\t\ttext-align:
+    center;\r\n\t\t\t}\r\n\r\n\t\t\t/*apply css properties to button tag*/\r\n\r\n\t\t\tbutton
+    {\r\n\t\t\t\twidth: 90px;\r\n\t\t\t\theight: 60px;\r\n\t\t\t\tfont-size: 30px;\r\n\t\t\t\tbackground-color:
+    green;\r\n\t\t\t\tcolor: honeydew;\r\n\t\t\t}\r\n\r\n\t\t\t/*apply hover effect
+    to button tag*/\r\n\r\n\t\t\tbutton:hover {\r\n\t\t\t\tbackground-color: greenyellow;\r\n\t\t\t\tcolor:
+    grey;\r\n\t\t\t}\r\n\r\n\t\t\t/*apply css properties to h2 tag*/\r\n\r\n\t\t\th2
+    {\r\n\t\t\t\tcolor: black;\r\n\t\t\t\tmargin: 0 50px;\r\n\t\t\t\tfont-size: 45px;\r\n\t\t\t}\r\n\t\t\t/*apply
+    css properties to h1 tag*/\r\n\r\n\t\t\th1 {\r\n\t\t\t\tfont-size: 35px;\r\n\t\t\t\tcolor:
+    green;\r\n\t\t\t\ttext-align: center;\r\n\t\t\t\tpadding-left: 10%;\r\n\t\t\t}\r\n\t\t</style>\r\n\t</head>\r\n\r\n\t<body>\r\n\t\t<!--
+    give a suitable heading using h1 tag-->\r\n\t\t<h1>Increment and Decrement counter</h1>\r\n\r\n\t\t<div
+    =\"container\">\r\n\t\t\t<!-- adding button and heading to show the digits -->\r\n\t\t\t<!--
+    increment() and decrement() functions on button click-->\r\n\t\t\t<button onclick=\"increment()\">+</button>\r\n\t\t\t<h2
+    id=\"counting\"></h2>\r\n\t\t\t<button onclick=\"decrement()\">-</button>\r\n\t\t</div>\r\n\t\t<!--
+    JavaScript code-->\r\n\t\t<script>\r\n\t\t\t//initialising a variable name data\r\n\t\t\tvar
+    data = 0;\r\n\r\n\t\t\t//printing default value of data that is 0 in h2 tag\r\n\t\t\tdocument.getElementById(\"counting\").innerText
+    = data;\r\n\r\n\t\t\t//creation of increment function\r\n\t\t\tfunction increment()
+    {\r\n\t\t\t\tdata = data + 1;\r\n\t\t\t\tdocument.getElementById(\"counting\").innerText
+    = data;\r\n\t\t\t}\r\n\t\t\t//creation of decrement function\r\n\t\t\tfunction
+    decrement() {\r\n\t\t\t\tdata = data - 1;\r\n\t\t\t\tdocument.getElementById(\"counting\").innerText
+    = data;\r\n\t\t\t}\r\n\t\t</script>\r\n\t</body>\r\n</html>\r\n"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: web-config
+  namespace: web
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: web-server
+  name: web-server
+  namespace: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-server
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: web-server
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        volumeMounts:
+        - name: config
+          mountPath: "/usr/share/nginx/html/"
+      volumes:
+      - name: config
+        configMap:
+          name: web-config
+          items:
+          - key: "index.html"
+            path: "index.html"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: web-server
+  name: web-server
+  namespace: web
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: web-server
+  type: LoadBalancer
+status:
+  loadBalancer: {}
