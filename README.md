@@ -1,8 +1,8 @@
 # kubernetes-sampath-web-app-with-monitoring
 ## Overview
 ### Deployment in Kubernetes
-- [db.yaml] : Creates MySQL deployment
-- [web-app.yaml]: Create web server deployment
+- [db.yaml] : Creates MySQL deployment (```kubectl apply -f db.yaml```)
+- [web-app.yaml]: Create web server deployment (```kubectl apply -f web-app.yaml```)
 
 ### Monitoring setup
 - Add helm repo : ```helm repo add prometheus-community https://prometheus-community.github.io/helm-charts```
